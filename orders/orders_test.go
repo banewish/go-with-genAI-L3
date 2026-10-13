@@ -16,19 +16,49 @@ type fakeStore struct {
 	err       error
 }
 
-func (f *fakeStore) Exec(query string, args ...any) error {
+// fakeResult — мок-реалізація Result для тестування
+type fakeResult struct {
+	id  string
+	err error
+}
+
+func (r *fakeResult) OrderID() string {
+	return r.id
+}
+
+func (r *fakeResult) Error() error {
+	return r.err
+}
+
+func (f *fakeStore) Exec(query string, args ...any) (Result, error) {
 	f.calls++
 	f.lastQuery = query
 	f.lastArgs = args
-	return f.err
+
+	// Витягнути orderID з аргументів (перший аргумент)
+	var orderID string
+	if len(args) > 0 {
+		if id, ok := args[0].(string); ok {
+			orderID = id
+		}
+	}
+
+	return &fakeResult{id: orderID, err: f.err}, f.err
 }
 
 func TestPlaceOrder_Success(t *testing.T) {
 	store := &fakeStore{}
 	svc := NewOrderService(store)
 
-	if err := svc.PlaceOrder("order-1", 42.5); err != nil {
+	result, err := svc.PlaceOrder("order-1", 42.5)
+	if err != nil {
 		t.Fatalf("PlaceOrder повернув неочікувану помилку: %v", err)
+	}
+	if result == nil {
+		t.Fatal("PlaceOrder повернув nil Result")
+	}
+	if result.OrderID() != "order-1" {
+		t.Fatalf("Result.OrderID() = %q, очікувалось 'order-1'", result.OrderID())
 	}
 
 	if store.calls != 1 {
@@ -46,8 +76,15 @@ func TestPlaceOrder_PropagatesError(t *testing.T) {
 	store := &fakeStore{err: errors.New("db is down")}
 	svc := NewOrderService(store)
 
-	if err := svc.PlaceOrder("order-2", 10); err == nil {
+	result, err := svc.PlaceOrder("order-2", 10)
+	if err == nil {
 		t.Fatal("PlaceOrder мав повернути помилку, коли store.Exec її повертає")
+	}
+	if result == nil {
+		t.Fatal("PlaceOrder повернув nil Result навіть при помилці")
+	}
+	if result.Error() == nil {
+		t.Fatal("Result.Error() повинен повернути помилку")
 	}
 }
 
@@ -63,7 +100,13 @@ func TestOrderServiceUsesInjectedStore(t *testing.T) {
 		t.Fatal("NewOrderService повернув nil")
 	}
 
-	_ = svc.PlaceOrder("order-3", 5)
+	result, err := svc.PlaceOrder("order-3", 5)
+	if err != nil {
+		t.Fatalf("PlaceOrder повернув неочікувану помилку: %v", err)
+	}
+	if result == nil {
+		t.Fatal("PlaceOrder повернув nil Result")
+	}
 	if store.calls == 0 {
 		t.Error("PlaceOrder не викликав store.Exec — перевірте, що сервіс справді використовує injected store")
 	}

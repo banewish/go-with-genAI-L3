@@ -9,11 +9,31 @@
 // ШІ тест додайте окремо (наприклад, у orders_ai_test.go) для звіту.
 package orders
 
+// Result — мінімальний інтерфейс для результату операції
+type Result interface {
+	OrderID() string
+	Error() error
+}
+
+// orderResult — конкретна реалізація Result
+type orderResult struct {
+	id  string
+	err error
+}
+
+func (r *orderResult) OrderID() string {
+	return r.id
+}
+
+func (r *orderResult) Error() error {
+	return r.err
+}
+
 // OrderStore — мінімальний інтерфейс для залежності від БД
 // (Завдання 2.1). Замінює прямий *sql.DB, дотримуючись приказки
 // Роба Пайка: "чим більший інтерфейс, тим слабша абстракція".
 type OrderStore interface {
-	Exec(query string, args ...any) error
+	Exec(query string, args ...any) (Result, error)
 }
 
 // OrderService — Завдання 2.2: сервіс приймає залежність через
@@ -28,13 +48,7 @@ func NewOrderService(store OrderStore) *OrderService {
 }
 
 // PlaceOrder виконує вставку замовлення через store.
-//
-// TODO (Завдання 2.2): реалізуйте цей метод.
-//   - викличте s.store.Exec(...) із SQL-запитом і аргументами
-//     orderID та amount;
-//   - поверніть помилку, якщо Exec її повернув;
-//   - інакше поверніть nil.
-func (s *OrderService) PlaceOrder(orderID string, amount float64) error {
-	// TODO: ваш код тут
-	return nil
+func (s *OrderService) PlaceOrder(orderID string, amount float64) (Result, error) {
+	query := "INSERT INTO orders (id, amount) VALUES (?, ?)"
+	return s.store.Exec(query, orderID, amount)
 }
