@@ -13,11 +13,12 @@
 - **бажаний формат виводу** (наприклад, "поверни лише Go-код у трьох
   блоках: інтерфейс, сервіс, мок").
 
+
+## Мій промпт
+
 lets say im golang dev, whos making microservices
 create minimal interface, 
 rewrite OrderService on dependecny injection through constructor
 generate mock realisation for tests without real DB
 also make the output to be returned in interface and service
-
-## Мій промпт
 

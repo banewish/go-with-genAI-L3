@@ -2,23 +2,18 @@
 
 ## 1. Посилання на код
 
-<!-- TODO(звіт-1): видаліть цей HTML-коментар і вставте посилання на
-     ваш робочий Go-код із Розділу 1 (наприклад, посилання на цей
-     самий репозиторій / конкретний коміт / гілку). -->
+https://github.com/banewish/go-with-genAI-L3
 
 ## 2. Промпт з Розділу 2
 
 Точний текст промпту зберігається в
 [`prompts/interface-extraction-prompt.md`](./prompts/interface-extraction-prompt.md).
 
-## 3. Міксовані приймачі та інтерфейси на стороні споживача
+## 3. Mixed Receivers and Consumer-Side Interfaces
 
-Дайте відповідь своїми словами (1-2 абзаци) на питання: *«Чому
-міксування value та pointer ресиверів є небезпечним і як ШІ допомагає
-проектувати інтерфейси на стороні споживача?»*
+Mixing value and pointer receivers on the same type is dangerous because it creates implicit, hard-to-detect mutability contracts. When some methods use value receivers (read-only, no mutations) and others use pointer receivers (mutating), developers can't tell at a glance whether calling a method will modify state or not. This leads to subtle, confusing bugs—especially in scenarios like iterating over a slice of values where `for _, w := range` creates copies. Even if `Deposit()` has a pointer receiver, calling it on a copy means mutations vanish silently. The compiler doesn't enforce consistency, so the burden falls on developers to remember: "value receiver = no mutations, pointer receiver = mutations expected."
 
-<!-- TODO(звіт-3): видаліть цей HTML-коментар і напишіть вашу
-     відповідь (1-2 абзаци) звичайним видимим текстом Markdown. -->
+AI helps solve this by enforcing the **Golden Rule**: if any method on a type needs to mutate, all methods should use pointer receivers for consistency and clarity. From the consumer's perspective, AI can help design minimal, focused interfaces (like `OrderStore` with just `Exec()`) and generate mock implementations that don't require a real database—making tests fast and isolated. By analyzing code patterns and suggesting dependency injection through constructors, AI teaches developers to design interfaces around what consumers actually need, not what the implementation happens to provide. This shifts the design perspective from "what does my type do?" to "what minimal contract does my consumer require?"—leading to cleaner, more testable code.
 
 ## 4. Скріншоти / відео виконання
 
