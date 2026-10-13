@@ -6,17 +6,24 @@ https://github.com/banewish/go-with-genAI-L3
 
 ## 2. Промпт з Розділу 2
 
+lets say im golang dev, whos making microservices
+create minimal interface, 
+rewrite OrderService on dependecny injection through constructor
+generate mock realisation for tests without real DB
+also make the output to be returned in interface and service
+
 Точний текст промпту зберігається в
 [`prompts/interface-extraction-prompt.md`](./prompts/interface-extraction-prompt.md).
 
-## 3. Mixed Receivers and Consumer-Side Interfaces
+## 3. Міксовані приймачі та інтерфейси на стороні споживача
 
-Mixing value and pointer receivers on the same type is dangerous because it creates implicit, hard-to-detect mutability contracts. When some methods use value receivers (read-only, no mutations) and others use pointer receivers (mutating), developers can't tell at a glance whether calling a method will modify state or not. This leads to subtle, confusing bugs—especially in scenarios like iterating over a slice of values where `for _, w := range` creates copies. Even if `Deposit()` has a pointer receiver, calling it on a copy means mutations vanish silently. The compiler doesn't enforce consistency, so the burden falls on developers to remember: "value receiver = no mutations, pointer receiver = mutations expected."
+Дайте відповідь своїми словами (1-2 абзаци) на питання: *«Чому
+міксування value та pointer ресиверів є небезпечним і як ШІ допомагає
+проектувати інтерфейси на стороні споживача?»*
 
-AI helps solve this by enforcing the **Golden Rule**: if any method on a type needs to mutate, all methods should use pointer receivers for consistency and clarity. From the consumer's perspective, AI can help design minimal, focused interfaces (like `OrderStore` with just `Exec()`) and generate mock implementations that don't require a real database—making tests fast and isolated. By analyzing code patterns and suggesting dependency injection through constructors, AI teaches developers to design interfaces around what consumers actually need, not what the implementation happens to provide. This shifts the design perspective from "what does my type do?" to "what minimal contract does my consumer require?"—leading to cleaner, more testable code.
+AI helps solve this by providing the golden rule as if any method on a type needs to mutate, all methods should use pointer receivers at least for clarity. AI can help design minimal, focused interfaces and generate mock implementations that dont require a real database—making tests fast and isolated.
+ By analyzing code patterns and suggesting dependency injection through constructors, AI teaches developers to design interfaces around what consumers actually need, not what the implementation happens to provide. This leading to cleaner, more testable code.
 
 ## 4. Скріншоти / відео виконання
 
-<!-- TODO(звіт-4): видаліть цей HTML-коментар і вставте посилання на
-     Google Doc / відео зі скріншотами роботи програми та виконаного
-     завдання. -->
+https://docs.google.com/document/d/1TBVtt4iMx7kTVYB7kYt0jUoajfXB_JWOXSEyQVkkNlY/edit?usp=sharing
